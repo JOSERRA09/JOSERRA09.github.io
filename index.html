@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MemoramaDeFutbol</title>
+  <style>
+    body {
+      background-color: rgb(0, 0, 0);
+      color: white;
+      text-align: center;
+    }
+    canvas {
+      background-color: rgb(7, 216, 0);
+      border: 5px solid rgb(255, 252, 252);
+      display: block;
+      margin: 0 auto;
+    }
+    #timer, #pairsCounter, #endMessage, #levelCounter {
+      font-size: 30px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    #startButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #06a700;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 5px;
+    }
+    #title {
+      font-size: 35px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+          <!--TITULO DEL JUEGO-->
+  <h2 id="title">MEMORAMA FUTBOL PLAYERS</h2>
+                <!--TIEMPO-->
+  <div id="timer">Tiempo: 0s</div>
+
+             <!--PARESACERTADAS-->
+  <div id="pairsCounter">Pares Acertados: 0</div>
+
+            <!---NIVELCONTADOR-->
+  <div id="levelCounter">Nivel: 1</div>
+
+          <!---MENSAJE AL FINALIZAR EL JUEGO-->
+  <div id="endMessage"></div>
+
+  <canvas id="mycanvas" width="600" height="700"></canvas>
+
+  <!-- AUDIOS DE LAS CARTAS Y MUSICA DE FONDO -->
+  <audio id="MusicaDeFondo" loop>
+    <source src="HimnoDeLaWCL.mp3" type="audio/mp3">
+  </audio>
+  <audio id="Sonido">
+    <source src="Balon.mp3" type="audio/mp3">
+  </audio>
+  <audio id="nopar">
+    <source src="que-miras-bobo-messi.mp3" type="audio/mp3">
+  </audio>
+  <audio id="CHE-CHE">
+    <source src="CHE-CHE.MP3" type="audio/mp3">
+  </audio>
+  <audio id="EncaraMessi">
+    <source src="EncaraMessi.mp3" type="audio/mp3">
+  </audio>
+  <audio id="SIUU">
+    <source src="SIUUU.mp3" type="audio/mp3">
+  </audio>
+  <audio id="H9">
+    <source src="HAALAND.mp3" type="audio/mp3">
+  </audio>
+  <audio id="RP">
+    <source src="R11.mp3" type="audio/mp3">
+  </audio>
+  <audio id="LY">
+    <source src="LY19.mp3" type="audio/mp3">
+  </audio>
+  <audio id="R10">
+    <source src="RG10.mp3" type="audio/mp3">
+  </audio>
+  <audio id="B9">
+    <source src="BA9.mp3" type="audio/mp3">
+  </audio>
+  <audio id="JB5">
+    <source src="BH5.mp3" type="audio/mp3">
+  </audio>
+  <audio id="KM10">
+    <source src="KM10.mp3" type="audio/mp3">
+  </audio>
+  <audio id="PD">
+    <source src="PD20.mp3" type="audio/mp3">
+  </audio>
+  <audio id="D10">
+    <source src="DM10.mp3" type="audio/mp3">
+  </audio>
+  <audio id="M10">
+    <source src="JM10.mp3" type="audio/mp3">
+  </audio>
+  <audio id="AH17">
+    <source src="AG17.mp3" type="audio/mp3">
+  </audio>
+  <audio id="JL9">
+    <source src="JA9.mp3" type="audio/mp3">
+  </audio>
+
+  <button id="startButton">Iniciar Juego</button>
+
+  <script>
+    const mycanvas = document.getElementById("mycanvas");
+    const ctx = mycanvas.getContext("2d");
+    const MusicaDeFondo = document.getElementById("MusicaDeFondo");
+    const timerDiv = document.getElementById("timer");
+    const startButton = document.getElementById("startButton");
+    const Sonido = document.getElementById("Sonido");
+    const pairsCounterDiv = document.getElementById("pairsCounter");
+    const levelCounterDiv = document.getElementById("levelCounter");
+    const endMessageDiv = document.getElementById("endMessage");
+    const title = document.getElementById("title");
+    const nopar = document.getElementById("nopar");
+
+    const sonidosPares = [
+      document.getElementById("CHE-CHE"),
+      document.getElementById("EncaraMessi"),
+      document.getElementById("SIUU"),
+      document.getElementById("H9"),
+      document.getElementById("RP"),
+      document.getElementById("LY"),
+      document.getElementById("R10"),
+      document.getElementById("B9"),
+      document.getElementById("JB5"),
+      document.getElementById("KM10"),
+      document.getElementById("PD"),
+      document.getElementById("D10"),
+      document.getElementById("M10"),
+      document.getElementById("AH17"),
+      document.getElementById("JL9"),
+    ];
+
+    var Cartas = [];
+    var voltearCarta = [];
+    var Pares = 0;
+    var nivel = 1;
+    var totalPares = 4; 
+    var acertados = 0;
+    var InicioTiempo;
+    var nivelInicioTiempo; 
+    var tiempoPorNivel = []; 
+    var IniciarJuego = false;
+
+    //////////CARGA LAS IMAGENES
+    const cartaImage = ["Neymar.png", "Messi.png", "CR7.png", "H9.png", "RP.png", "LY.png", "R10.png", "B.9.png", "BH5.png", "KM.png", "PD.png", "D10.png", "M10.png", "G17.png", "JL.png"];
+    let cartasdeljuego = [];
+
+    function actualizarCartasDelJuego() {
+      cartasdeljuego = [];
+      for (let i = 0; i < totalPares; i++) {
+        cartasdeljuego.push(cartaImage[i % cartaImage.length]);
+      }
+      cartasdeljuego = [...cartasdeljuego, ...cartasdeljuego];
+      Barajear(cartasdeljuego);
+    }
+
+    /////////BARAJEAR LAS CARTAS
+    function Barajear(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    ///////ICARTAS
+    function Icartas() {
+      Cartas = [];
+      for (let i = 0; i < cartasdeljuego.length; i++) {
+        Cartas.push({ voltear: false, matched: false });
+      }
+      drawcartas();
+    }
+
+    //////DIBUJA AS CARTAS DENTRO DEL CANVAS
+    function drawcartas() {
+      ctx.clearRect(0, 0, mycanvas.width, mycanvas.height);
+
+      ////DIBUJA EL CAMPO DE FUTBOL
+      drawCampo();
+      for (let i = 0; i < cartasdeljuego.length; i++) {
+        const x = (i % 5) * 120;
+        const y = Math.floor(i / 5) * 120;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(x, y, 100, 100);
+
+        ////MUESTRA LA IMAGEN CUNADO LA CARTA ESTA VOLTEADA
+        if (Cartas[i].voltear || Cartas[i].matched) {
+          const img = new Image();
+          img.src = cartasdeljuego[i];
+          img.onload = function(){
+            ctx.drawImage(img, x, y, 100, 100);
+          };
+        } else {
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(x + 5, y + 5, 90, 90);
+        }
+      }
+    }
+/////VERIFICA SI HAY UN PAR
+    function checkForMatch() {
+      if (voltearCarta.length === 2) {
+        const [firstCard, secondCard] = voltearCarta;
+        const firstIndex = firstCard.index;
+        const secondIndex = secondCard.index;
+
+        if (cartasdeljuego[firstIndex] === cartasdeljuego[secondIndex]) {
+          Cartas[firstIndex].matched = true;
+          Cartas[secondIndex].matched = true;
+          acertados++;
+          const sonidoIndex = acertados < sonidosPares.length ? acertados - 1 : sonidosPares.length - 1;
+          sonidosPares[sonidoIndex].play();
+          pairsCounterDiv.textContent = `Pares Acertados: ${acertados}`;
+        } else {
+
+          setTimeout(() => {
+            Cartas[firstIndex].voltear = false;
+            Cartas[secondIndex].voltear = false;
+            drawcartas();
+            nopar.play();
+          }, 1000);
+        }
+        voltearCarta = [];
+
+        if (acertados === totalPares) {
+          setTimeout(nextLevel, 1000);
+        }
+      }
+    }
+
+    ///////////FINALIZAR JUEGO
+    function endGame() {
+      IniciarJuego = false;
+      MusicaDeFondo.pause();
+      const finalTime = tiempoPorNivel.reduce((total, time) => total + time, 0);
+      const finalTimeInSeconds = Math.floor(finalTime / 1000);
+      endMessageDiv.textContent = `¡Felicidades! Completaste el juego en ${finalTimeInSeconds}s en el nivel ${nivel}.`;
+      endMessageDiv.style.display = "block";
+      mycanvas.removeEventListener("click", handleClick);
+    }
+
+
+    function handleClick(e) {
+      if (!IniciarJuego) return;
+      const x = e.offsetX;
+      const y = e.offsetY;
+      const index = Math.floor(x / 120) + Math.floor(y / 120) * 5;
+
+      if (!Cartas[index].voltear && voltearCarta.length < 2) {
+        Cartas[index].voltear = true;
+        voltearCarta.push({ index: index });
+        Sonido.play();
+        drawcartas();
+        checkForMatch();
+      }
+    }
+
+    /////NIVEL DEL JUEGO
+    function nextLevel() {
+      if (acertados < totalPares) {
+        alert("Completa todos los pares antes de pasar al siguiente nivel.");
+        return;
+      }
+
+      if (acertados >= 15) {
+        endGame();
+        return;
+      }
+
+
+
+
+      const nivelFinalTime = Date.now() - nivelInicioTiempo;
+      tiempoPorNivel.push(nivelFinalTime);
+      nivel++;
+      totalPares = Math.min(totalPares + 2, 15); 
+      acertados = 0;
+      voltearCarta = [];
+      actualizarCartasDelJuego();
+      Icartas();
+      levelCounterDiv.textContent = `Nivel: ${nivel}`;
+      nivelInicioTiempo = Date.now(); 
+    }
+
+
+    //////// DISEÑO DEL CAMPO DE FUTBOL
+    function drawCampo() {
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 330, 230, 10);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(0, 330, 230, 10);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(180, 70, 230, 10);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(180, 70, 230, 10);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(170, 0, 15, 80);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(170, 0, 15, 80);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(395, 0, 15, 80);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(395, 0, 15, 80);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(180, 610, 230, 10);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(180, 610, 230, 10);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(170, 610, 15, 90);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(170, 610, 15, 90);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(400, 610, 15, 90);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(400, 610, 15, 90);
+
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.fillRect(370, 330, 230, 10);
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 5;
+      ctx.strokeRect(370, 330, 230, 10);
+
+      //// CIRCULO DEL CAMPO
+      ctx.beginPath();
+      ctx.arc(300, 330, 70, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 5;
+      ctx.stroke();
+    }
+
+    ///// TIEMPO DEL JUEGO
+    function Tiempo() {
+      const currentTime = Date.now();
+      const elapsedTime = Math.floor((currentTime - InicioTiempo) / 1000);
+      timerDiv.textContent = `Tiempo: ${elapsedTime}s`;
+      requestAnimationFrame(Tiempo);
+    }
+
+    ///////////// INICIO DE LA MUSICA DE FONDO AL HACER CLIC AL BOTON, TITULO DEL JUEGO, TIEMPO, CONTADOR DE PARES, BOTON DEL JUEGO
+    startButton.addEventListener("click", () => {
+      MusicaDeFondo.play();
+      startButton.style.display = "none";
+      title.style.display = "none";
+      timerDiv.style.display = "block";
+      pairsCounterDiv.style.display = "block";
+      levelCounterDiv.style.display = "block";
+      endMessageDiv.style.display = "none";
+      IniciarJuego = true;
+      nivel = 1;
+      totalPares = 4;
+      acertados = 0;
+      voltearCarta = [];
+      tiempoPorNivel = []; 
+      actualizarCartasDelJuego();
+      Icartas();
+      InicioTiempo = Date.now();
+      nivelInicioTiempo = InicioTiempo; 
+      Tiempo();
+      levelCounterDiv.textContent = `Nivel: ${nivel}`;
+      mycanvas.addEventListener("click", handleClick);
+    });
+
+    ///// LLAMA EL CAMPO DE FUTBOL AL CARGAR LA PAGINA PARA MOSTRAR EN EL JUEGO
+    drawCampo();
+  </script>
+</body>
+</html>
