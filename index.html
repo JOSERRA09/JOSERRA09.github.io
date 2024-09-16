@@ -126,21 +126,21 @@
     const nopar = document.getElementById("nopar");
 
     const sonidosPares = [
-      document.getElementById("CHE-CHE"),
-      document.getElementById("EncaraMessi"),
-      document.getElementById("SIUU"),
-      document.getElementById("H9"),
-      document.getElementById("RP"),
-      document.getElementById("LY"),
-      document.getElementById("R10"),
-      document.getElementById("B9"),
-      document.getElementById("JB5"),
-      document.getElementById("KM10"),
-      document.getElementById("PD"),
-      document.getElementById("D10"),
-      document.getElementById("M10"),
-      document.getElementById("AH17"),
-      document.getElementById("JL9"),
+      document.getElementById("CHE-CHE"),////NEYMAR JR
+      document.getElementById("EncaraMessi"),////MESSI
+      document.getElementById("SIUU"),///C RONALDO
+      document.getElementById("H9"),////ERLING HAALAND
+      document.getElementById("RP"),////RAPHINA
+      document.getElementById("LY"),////LAMINE YAMAL
+      document.getElementById("R10"),////RONALDINHO
+      document.getElementById("B9"),////BENZEMA
+      document.getElementById("JB5"),////JUDE BELINHAM
+      document.getElementById("KM10"),///KYLIAN MBAPPE
+      document.getElementById("PD"),///PEDRI
+      document.getElementById("D10"),////DIEGO MARADONA
+      document.getElementById("M10"),//// JAMAL MUSIALA
+      document.getElementById("AH17"),////ALEJANDRO GARNACHO
+      document.getElementById("JL9"),//// JULIAN ALVAREZ
     ];
 
     var Cartas = [];
@@ -225,6 +225,7 @@
           pairsCounterDiv.textContent = `Pares Acertados: ${acertados}`;
         } else {
 
+          ///SONIDO CUANDO NO ES PAR 
           setTimeout(() => {
             Cartas[firstIndex].voltear = false;
             Cartas[secondIndex].voltear = false;
@@ -278,9 +279,6 @@
         endGame();
         return;
       }
-
-
-
 
       const nivelFinalTime = Date.now() - nivelInicioTiempo;
       tiempoPorNivel.push(nivelFinalTime);
